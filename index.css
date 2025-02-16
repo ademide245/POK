@@ -1,0 +1,30 @@
+body{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    text-align: center;
+    background-color: black;
+    padding: 20px;
+}
+.container{
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 10px rgba(red);
+    max-width: 400px;
+    margin: auto;
+}
+h1{
+    color: blue;
+}
+button{
+    padding: 10px 20px;
+    background: blueviolet;
+    color:black;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 15px;
+
+}
+button:hover{
+    background-color: blue;
+}

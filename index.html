@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>alert</title>
+ <link rel="stylesheet" href="index.css">
+ <!-- <script src="script.js" defer></script> -->
+</head>
+<body>
+   
+    <div class="container">
+        <h1>Flood Alert System</h1>
+        <p id="location">Fetching location...</p>
+        <p id="alert">Checking for flood alerts...</p>
+        <button onclick="getFloodAlerts()">Check Alerts</button>
+    </div>
+    
+    <p id="flood"></p>
+    
+    <script>
+        const API_KEY = "YOUR_OPENWEATHERMAP_API_KEY";
+    
+        function getFloodAlerts() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    document.getElementById("location").innerText = `Location: ${lat.toFixed(2)}, ${lon.toFixed(2)}`;
+                    fetchFloodData(lat, lon);
+                }, () => {
+                    alert("Location access denied. Unable to fetch alerts.");
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+    
+        async function fetchFloodData(lat, lon) {
+            const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.weather) {
+                    const alertMessage = checkFloodRisk(data);
+                    document.getElementById("alert").innerText = alertMessage;
+                    if (alertMessage.includes("danger")) {
+                        sendNotification("Flood alert!", alertMessage);
+                    }
+                } else {
+                    document.getElementById("alert").innerText = "No flood alerts found.";
+                }
+            } catch (error) {
+                document.getElementById("alert").innerText = "No flood alerts found.";
+                console.error(error);
+            }
+        }
+    
+        function checkFloodRisk(data) {
+            const rainfall = data.rain ? data.rain["1h"] || 0 : 0;
+            let floodMessage = "";
+            if (rainfall > 10) {
+                floodMessage = "Heavy rainfall detected! Possible flood risk.";
+            } else if (rainfall > 5) {
+                floodMessage = "Moderate rainfall detected. Stay alert.";
+            } else {
+                floodMessage = "No flood warnings. Weather is safe.";
+            }
+    
+            document.getElementById("flood").innerText = floodMessage;
+            return floodMessage;
+        }
+    
+        function sendNotification(title, message) {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        new Notification(title, { body: message });
+                    }
+                });
+            }
+        }
+    </script>
+    
+</body>
+</html>
